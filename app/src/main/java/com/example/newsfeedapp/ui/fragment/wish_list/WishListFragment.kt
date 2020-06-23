@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.SearchView
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -18,21 +19,22 @@ import com.example.newsfeedapp.common.showDialog
 import com.example.newsfeedapp.data.model.Article
 import com.example.newsfeedapp.ui.adapter.NewsAdapter
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_wish_list.*
 import org.koin.android.viewmodel.ext.android.getViewModel
 
+@AndroidEntryPoint
 
 class WishListFragment : Fragment(R.layout.fragment_wish_list), NewsAdapter.Interaction,
     SearchView.OnQueryTextListener {
 
-    lateinit var viewModel: FavouriteViewModel
+    private val viewModel: FavouriteViewModel by viewModels()
     private val newsAdapter by lazy { NewsAdapter(this) }
     private lateinit var favList: MutableList<Article>
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = getViewModel()
         favList = mutableListOf()
         setHasOptionsMenu(true)
         setupRecyclerView()

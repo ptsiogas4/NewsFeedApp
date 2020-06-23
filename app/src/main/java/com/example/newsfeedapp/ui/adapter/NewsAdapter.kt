@@ -6,13 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.example.newsfeedapp.R
 import com.example.newsfeedapp.common.dateFormat
+import com.example.newsfeedapp.common.loadImage
 import com.example.newsfeedapp.data.model.Article
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.item_news.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.get
+import javax.inject.Inject
+
 
 class NewsAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -53,17 +58,17 @@ class NewsAdapter(private val interaction: Interaction? = null) :
         return differ.currentList.size
     }
 
-    class NewsViewHolder(itemView: View, private val interaction: Interaction?) :
-        RecyclerView.ViewHolder(itemView), KoinComponent {
+    class NewsViewHolder ( itemView: View, private val interaction: Interaction?) :
+        RecyclerView.ViewHolder(itemView) {
 
-        private val glide: RequestManager = get()
+
 
         fun bind(item: Article) = with(itemView) {
             itemView.setOnClickListener {
                 interaction?.onItemSelected(adapterPosition, item)
             }
-            glide.load(item.urlToImage)
-                .into(articleImage)
+
+            articleImage.loadImage(item.urlToImage)
             titleTxt.text = item.title
             authorNameTxt.text = "By ${item.author} "
             dateTxt.text = "${dateFormat(item.publishedAt)}"

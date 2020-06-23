@@ -5,8 +5,9 @@ import android.util.Log
 import com.example.newsfeedapp.data.model.Article
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
-class OnlineSourcesBasedRetroFit(private val service: IApiHelper) : IOnlineDataSource {
+class OnlineSourcesBasedRetroFit @Inject constructor (private val service: IApiHelper) : IOnlineDataSource {
 
     private val articlesNews = mutableListOf<Article>()
 
@@ -28,9 +29,10 @@ By zipping two flow collections using the Zip operator, both the network calls r
     override suspend fun getArticles(): List<Article> {
         service.getarticles("the-next-web")
             .zip(service.getarticles("associated-press")) { firstSource, secondSource ->
-                val allArticlesFromApi = mutableListOf<Article>()
-                firstSource.articles?.let { allArticlesFromApi.addAll(it) }
-                secondSource.articles?.let { allArticlesFromApi.addAll(it) }
+                val allArticlesFromApi = mutableListOf<Article>().apply {
+                    firstSource.articles?.let { addAll(it) }
+                    secondSource.articles?.let { addAll(it) }
+                }
                 return@zip allArticlesFromApi
             }.flowOn(Dispatchers.IO)
             .catch { e ->

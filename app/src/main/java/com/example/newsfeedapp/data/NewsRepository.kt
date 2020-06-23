@@ -9,9 +9,10 @@ import com.example.newsfeedapp.data.model.Article
 import com.example.newsfeedapp.data.sources.homeCahedData.IOfflineDataSource
 import com.example.newsfeedapp.data.sources.remoteApi.IOnlineDataSource
 import com.example.newsfeedapp.data.sources.remoteApi.OnlineSourcesBasedRetroFit
+import javax.inject.Inject
 
 
-class NewsRepository(
+class NewsRepository @Inject constructor(
     private val offlineDataSource: IOfflineDataSource,
     private val onlineDataSource: IOnlineDataSource,
     private val networkHandler: INetworkAwareHandler) {

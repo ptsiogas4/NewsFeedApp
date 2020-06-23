@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.RequestManager
@@ -14,23 +15,25 @@ import com.example.newsfeedapp.common.dateFormat
 import com.example.newsfeedapp.common.dateToTimeFormat
 import com.example.newsfeedapp.common.showMsg
 import com.example.newsfeedapp.common.showToast
-import com.example.newsfeedapp.ui.MainActivity
 import com.example.newsfeedapp.ui.fragment.wish_list.FavouriteViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_details.*
 import org.koin.android.viewmodel.ext.android.getViewModel
 import org.koin.core.KoinComponent
 import org.koin.core.get
+import javax.inject.Inject
 
 
-class DetailsFragment : Fragment(R.layout.fragment_details), KoinComponent {
+@AndroidEntryPoint
+class DetailsFragment : Fragment(R.layout.fragment_details) {
     private val args: DetailsFragmentArgs by navArgs()
-    private val glide: RequestManager = get()
-    lateinit var viewModel: FavouriteViewModel
+    @Inject
+    lateinit var glide: RequestManager
+    private val viewModel: FavouriteViewModel by viewModels()
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = getViewModel()
 
         bindData()
 
@@ -67,6 +70,8 @@ class DetailsFragment : Fragment(R.layout.fragment_details), KoinComponent {
         glide.load(args.article.urlToImage)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(articleImage)
+
+
 
         titleTxt.text = args.article.title
         authorNameTxt.text = args.article.author

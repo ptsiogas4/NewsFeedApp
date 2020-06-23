@@ -1,5 +1,6 @@
 package com.example.newsfeedapp.ui
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,15 +11,15 @@ import com.example.newsfeedapp.data.model.Article
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class NewsViewModel(private val newsRepository: NewsRepository) : ViewModel() {
+class NewsViewModel  @ViewModelInject constructor (private val newsRepository: NewsRepository) : ViewModel() {
 
-    var articleNews = MutableLiveData<Resource<Article>>()
+    private var articleNews = MutableLiveData<Resource<Article>>()
 
     init {
         getHomeNews()
     }
 
-    private fun getHomeNews() {
+     fun getHomeNews() {
         articleNews.postValue(Resource.Loading())
         viewModelScope.launch(Dispatchers.IO) {
             val result = newsRepository.getNewsSources()

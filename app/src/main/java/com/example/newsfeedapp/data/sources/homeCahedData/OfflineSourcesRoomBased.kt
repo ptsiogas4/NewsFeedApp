@@ -1,9 +1,10 @@
 package com.example.newsfeedapp.data.sources.homeCahedData
 
 import com.example.newsfeedapp.data.model.Article
+import javax.inject.Inject
 
 
-class OfflineSourcesRoomBased(private val homeDao: HomeNewsDao) : IOfflineDataSource {
+class OfflineSourcesRoomBased @Inject constructor (private val homeDao: HomeNewsDao) : IOfflineDataSource {
 
     override fun getArticles(): List<Article> = homeDao.getAllArticles()
 

@@ -1,61 +1,77 @@
 package  com.example.newsfeedapp.di
 
 
+import android.content.Context
+import androidx.room.Room
 import com.example.newsfeedapp.BuildConfig
+import com.example.newsfeedapp.data.sources.favouriteLocalData.FavouriteNewsDataBase
 import com.example.newsfeedapp.data.sources.remoteApi.ApiService
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
-val networkModule = module {
 
-    single {
-        Interceptor { chain ->
-            val request = chain.request()
-                .newBuilder()
-                .url(
-                    chain.request()
-                        .url
-                        .newBuilder()
-                        .addQueryParameter("apiKey", BuildConfig.API_KEY)
-                        .build()
-                )
-                .build()
-            return@Interceptor chain.proceed(request)   //explicitly return a value from whit @ annotation. lambda always returns the value of the last expression implicitly
-        }
-    }
+@Module
+@InstallIn(ApplicationComponent::class)
+object NetworkModule {
 
-    single {
-        OkHttpClient.Builder()
-            .addInterceptor(get<Interceptor>())
-            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+    @Provides
+    @Singleton
+    fun provideInterceptor()=   Interceptor { chain ->
+        val request = chain.request()
+            .newBuilder()
+            .url(
+                chain.request()
+                    .url
+                    .newBuilder()
+                    .addQueryParameter("apiKey", BuildConfig.API_KEY)
+                    .build()
+            )
             .build()
+        return@Interceptor chain.proceed(request)   //explicitly return a value from whit @ annotation. lambda always returns the value of the last expression implicitly
     }
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(interceptor: Interceptor)=   OkHttpClient.Builder()
+        .addInterceptor(interceptor)
+        .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
 
-    single {
-        GsonConverterFactory.create()
-    }
-    single {
-        CoroutineCallAdapterFactory()
-    }
 
-    single {
+    @Provides
+    @Singleton
+    fun provideGsonConverterFactory()=  GsonConverterFactory.create()
+
+    @Provides
+    @Singleton
+    fun provideCoroutineCallAdapterFactory()= CoroutineCallAdapterFactory()
+
+    @Provides
+    @Singleton
+    fun provideRetrofitBuilder(gsonConverterFactory: GsonConverterFactory,coroutineCallAdapterFactory: CoroutineCallAdapterFactory
+                        ,okHttpClient: OkHttpClient) =
         Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
-            .addConverterFactory(get<GsonConverterFactory>())
-            .addCallAdapterFactory(get<CoroutineCallAdapterFactory>())
-            .client(get<OkHttpClient>())
+            .addConverterFactory(gsonConverterFactory)
+            .addCallAdapterFactory(coroutineCallAdapterFactory)
+            .client(okHttpClient)
             .build()
-    }
+
+
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit) =retrofit.create(ApiService::class.java)
+
+
+
 }
 
-val apiServiceModule = module {
 
-    factory {
-        get<Retrofit>().create(ApiService::class.java)
-    }
-
-}

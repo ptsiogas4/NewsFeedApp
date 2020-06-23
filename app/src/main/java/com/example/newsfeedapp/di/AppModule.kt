@@ -1,5 +1,6 @@
 package  com.example.newsfeedapp.di
 
+import android.content.Context
 import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -7,43 +8,62 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.newsfeedapp.R
 import com.example.newsfeedapp.data.sources.favouriteLocalData.FavouriteNewsDataBase
 import com.example.newsfeedapp.data.sources.homeCahedData.HomeNewsDataBase
-import org.koin.android.ext.koin.androidContext
-
-import org.koin.dsl.module
-
-
-val roomModule = module {
-        single {
-            Room.databaseBuilder(get(), FavouriteNewsDataBase::class.java, "FAV_DATABASE_NAME")
-                .allowMainThreadQueries()
-                .fallbackToDestructiveMigration()
-                .build()
-        }
-
-        single { get<FavouriteNewsDataBase>().getFavouriteDao() }    //  FavouriteNewsDataBase().getFavouriteDao()
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Singleton
 
 
-        single {
-            Room.databaseBuilder(get(), HomeNewsDataBase::class.java, "NEWS_DATABASE_NAME")
-                .fallbackToDestructiveMigration()
-                .build()
-        }
+@Module
+@InstallIn(ApplicationComponent::class)
+object AppModule {
 
-        single { get<HomeNewsDataBase>().getHomeNewsDao() }
+
+    @Provides
+    @Singleton
+    fun provideFavouriteDatabase(@ApplicationContext context: Context)= Room.databaseBuilder(context,
+        FavouriteNewsDataBase::class.java, "FAV_DATABASE_NAME")
+        .allowMainThreadQueries()
+        .fallbackToDestructiveMigration()
+        .build()
+
+    @Singleton
+    @Provides
+    fun provideFavouriteDao(db:FavouriteNewsDataBase)=db.getFavouriteDao()
+
+
+    @Provides
+    @Singleton
+    fun provideNewsDatabase(@ApplicationContext context: Context)= Room.databaseBuilder(context,
+        HomeNewsDataBase::class.java, "NEWS_DATABASE_NAME")
+        .fallbackToDestructiveMigration()
+        .build()
+
+    @Singleton
+    @Provides
+    fun provideNewsDao(db:HomeNewsDataBase)=db.getHomeNewsDao()
+
+
+    @Provides
+    @Singleton
+    fun provideRequestOptionForGlide()=   RequestOptions
+        .placeholderOf(R.drawable.placeholder)
+        .error(R.drawable.placeholder)
+        .diskCacheStrategy(DiskCacheStrategy.ALL)
+
+
+    @Provides
+    @Singleton
+    fun provideGlide(@ApplicationContext context: Context,requestOptions: RequestOptions)=    Glide.with(context)
+        .setDefaultRequestOptions(requestOptions)
+
+
+
 }
 
-val glideModule = module {
-        single {
-            RequestOptions
-                .placeholderOf(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-        }
 
-        single {
-            Glide.with(androidContext())
-                .setDefaultRequestOptions(get())
 
-        }
 
-}
+

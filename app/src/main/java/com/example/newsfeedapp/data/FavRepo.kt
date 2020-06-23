@@ -3,8 +3,9 @@ package com.example.newsfeedapp.data
 import androidx.lifecycle.LiveData
 import com.example.newsfeedapp.data.model.Article
 import com.example.newsfeedapp.data.sources.favouriteLocalData.FavouriteNewsDao
+import javax.inject.Inject
 
-class FavRepo(private val favDao: FavouriteNewsDao) : FavouriteNewsDao {
+class FavRepo @Inject constructor (private val favDao: FavouriteNewsDao) : FavouriteNewsDao {
     override suspend fun insert(article: Article): Long = favDao.insert(article)
 
     override fun getAllArticles(): LiveData<List<Article>> = favDao.getAllArticles()

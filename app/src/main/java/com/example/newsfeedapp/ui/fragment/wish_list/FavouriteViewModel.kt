@@ -1,13 +1,15 @@
 package com.example.newsfeedapp.ui.fragment.wish_list
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsfeedapp.data.FavRepo
 import com.example.newsfeedapp.data.model.Article
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FavouriteViewModel (private val favRepo: FavRepo) : ViewModel() {
+class FavouriteViewModel @ViewModelInject constructor (private val favRepo: FavRepo) : ViewModel() {
 
 
 

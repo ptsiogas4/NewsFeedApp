@@ -15,10 +15,12 @@ import androidx.navigation.ui.navigateUp
 import com.example.newsfeedapp.R
 import com.example.newsfeedapp.common.showToast
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.nav_view
 import kotlinx.android.synthetic.main.app_bar_main.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -35,8 +37,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_explore,
-                R.id.nav_wish_list
+                R.id.nav_explore
+                //R.id.nav_wish_list
             ), drawer_layout
         )
         NavigationUI.setupActionBarWithNavController(this, navController, drawer_layout)

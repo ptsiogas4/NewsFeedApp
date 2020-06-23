@@ -2,8 +2,9 @@ package com.example.newsfeedapp.common
 
 import android.content.Context
 import android.net.ConnectivityManager
+import javax.inject.Inject
 
-class NetworkHandler (private val context: Context) :
+class NetworkHandler @Inject constructor (private val context: Context) :
     INetworkAwareHandler {
 
     override fun isOnline(): Boolean {
