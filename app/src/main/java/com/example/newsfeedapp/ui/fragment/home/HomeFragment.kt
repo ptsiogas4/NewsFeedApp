@@ -13,6 +13,7 @@ import com.example.newsfeedapp.common.*
 import com.example.newsfeedapp.data.model.Article
 import com.example.newsfeedapp.ui.NewsViewModel
 import com.example.newsfeedapp.ui.adapter.NewsAdapter
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.koin.android.viewmodel.ext.android.getViewModel
 
@@ -36,9 +37,26 @@ class HomeFragment : Fragment(R.layout.fragment_home), NewsAdapter.Interaction,
 
         setupRecyclerView()
         observeToNewsLiveData()
+        observeToErrorLiveData(view)
+
     }
 
-
+    private fun observeToErrorLiveData(view: View) {
+        viewModel.error.observe(viewLifecycleOwner, Observer {
+            if(it){
+                viewModel.error.postValue(false)
+                Snackbar.make(
+                    view,
+                    ("No Data Saved "),
+                    Snackbar.LENGTH_INDEFINITE
+                )
+                    .setAction(("retry")) {
+                        viewModel.getHomeNews()
+                    }
+                    .show()
+            }
+        })
+    }
 
 
     private fun observeToNewsLiveData() {
