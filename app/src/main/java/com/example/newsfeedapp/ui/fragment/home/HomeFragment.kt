@@ -1,7 +1,6 @@
 package com.example.newsfeedapp.ui.fragment.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
@@ -10,53 +9,59 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.RequestManager
 import com.example.newsfeedapp.R
 import com.example.newsfeedapp.common.*
 import com.example.newsfeedapp.data.model.Article
 import com.example.newsfeedapp.ui.NewsViewModel
 import com.example.newsfeedapp.ui.adapter.NewsAdapter
-import com.example.newsfeedapp.ui.fragment.wish_list.FavouriteViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_home.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home), NewsAdapter.Interaction,
     SearchView.OnQueryTextListener {
 
     private val viewModel: NewsViewModel by viewModels()
-
     private val newsAdapter by lazy { NewsAdapter(this) }
-
     private lateinit var responseList: MutableList<Article>
-
-    @Inject
-    lateinit var glide: RequestManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-     Log.e("a",glide.hashCode().toString())
 
         responseList = mutableListOf()
 
         setupRecyclerView()
         observeToNewsLiveData()
+        observeToErrorLiveData(view)
+
     }
 
-
+    private fun observeToErrorLiveData(view: View) {
+        viewModel.error.observe(viewLifecycleOwner, Observer {
+            if(it){
+                viewModel.error.postValue(false)
+                Snackbar.make(
+                    view,
+                    ("No Data Saved "),
+                    Snackbar.LENGTH_INDEFINITE
+                )
+                    .setAction(("retry")) {
+                        viewModel.getHomeNews()
+                    }
+                    .show()
+            }
+        })
+    }
 
 
     private fun observeToNewsLiveData() {
         viewModel.getNews().observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Resource.Error -> {
-                    swipeRefresh.isRefreshing = false
                     ProgressBar.gone()
-                    it.msg?.let { msg -> showToast(msg) }
-                    viewModel.getHomeNews()
                 }
+
                 is Resource.Loading -> ProgressBar.show()
                 is Resource.Success -> {
                     if (it.data != null) {
@@ -68,6 +73,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), NewsAdapter.Interaction,
                 }
             }
         })
+
     }
 
 
@@ -75,8 +81,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), NewsAdapter.Interaction,
         swipeRefresh.apply {
             setOnRefreshListener {
                 responseList.clear()
-                //observeToNewsLiveData()
-                   viewModel.getHomeNews()
+                observeToNewsLiveData()
+
             }
         }
 

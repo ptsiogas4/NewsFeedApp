@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 class NewsViewModel  @ViewModelInject constructor (private val newsRepository: NewsRepository) : ViewModel() {
 
     private var articleNews = MutableLiveData<Resource<Article>>()
+     var error = MutableLiveData<Boolean>()
+
 
     init {
         getHomeNews()
@@ -21,11 +23,14 @@ class NewsViewModel  @ViewModelInject constructor (private val newsRepository: N
 
      fun getHomeNews() {
         articleNews.postValue(Resource.Loading())
+
         viewModelScope.launch(Dispatchers.IO) {
             val result = newsRepository.getNewsSources()
+
             articleNews.postValue(Resource.Success(result))
             if(result.isNullOrEmpty()){
-                articleNews.postValue(Resource.Error(msg="No data saved "))
+                //articleNews.postValue(Resource.Error(msg="No data saved "))
+                error.postValue(true)
             }
         }
     }
