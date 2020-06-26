@@ -35,8 +35,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_explore,
-                R.id.nav_wish_list
+                R.id.nav_explore
             ), drawer_layout
         )
         NavigationUI.setupActionBarWithNavController(this, navController, drawer_layout)
@@ -49,6 +48,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         showToast(item.title.toString())
